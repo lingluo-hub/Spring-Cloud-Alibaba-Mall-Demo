@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: seata-storage-8006
+
+  datasource:
+    name: defaultDataSource
+    url: jdbc:mysql://localhost:3306/seata_storage?serverTimezone=UTC
+    username: root
+    password: 123456
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: public
+        username:
+        password:
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+        port: 8719
+
+server:
+  port: 8006
+seata:
+  application-id: ${spring.application.name}
+  tx-service-group: service-order-group
+
+  service:
+    grouplist:
+      seata-server: localhost:8091
+
+  registry:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+
+  config:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+
+feign:
+  sentinel:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+###################################### MyBatis 配置 ######################################
+mybatis:
+  # 指定 mapper.xml 的位置
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  #扫描实体类的位置,在此处指明扫描实体类的包，在 mapper.xml 中就可以不写实体类的全路径名
+  type-aliases-package: com.lingluo.storage.entity
+  configuration:
+    #默认开启驼峰命名法，可以不用设置该属性
+    map-underscore-to-camel-case: true

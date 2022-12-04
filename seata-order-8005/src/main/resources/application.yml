@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: seata-order-8005 #服务名
+  #数据源配置
+  datasource:
+    name: defaultDataSource
+    url: jdbc:mysql://localhost:3306/seata_order?serverTimezone=UTC #数据库连接地址
+    username: root  #数据库的用户名
+    password: 123456  #数据库密码
+    hikari:
+      max-lifetime: 60000
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848 #nacos 服务器地址
+        namespace: public #nacos 命名空间
+        username:
+        password:
+    sentinel:
+      transport:
+        dashboard: localhost:8080  #Sentinel 控制台地址
+        port: 8719
+
+server:
+  port: 8005  #端口
+seata:
+  application-id: ${spring.application.name}
+  #自定义服务群组，该值必须与 Nacos 配置中的 service.vgroupMapping.{my-service-group}=default 中的 {my-service-group}相同
+  tx-service-group: service-order-group
+  service:
+    grouplist:
+      #Seata 服务器地址
+      seata-server: localhost:8091
+  # Seata 的注册方式为 nacos
+  registry:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+  # Seata 的配置中心为 nacos
+  config:
+    type: nacos
+    nacos:
+      server-addr: localhost:8848
+
+feign:
+  sentinel:
+    enabled: true #开启 OpenFeign 功能
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+###################################### MyBatis 配置 ######################################
+mybatis:
+  # 指定 mapper.xml 的位置
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  #扫描实体类的位置,在此处指明扫描实体类的包，在 mapper.xml 中就可以不写实体类的全路径名
+  type-aliases-package: com.lingluo.order.entity
+  configuration:
+    #默认开启驼峰命名法，可以不用设置该属性
+    map-underscore-to-camel-case: true
